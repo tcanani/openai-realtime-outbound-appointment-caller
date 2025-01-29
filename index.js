@@ -96,7 +96,7 @@ fastify.post("/outgoing-call", async (request, reply) => {
 
 // TwiML for outgoing calls
 fastify.all("/outgoing-call-twiml", async (request, reply) => {
-    const firstMessage = request.query.firstMessage || "Hi, how are you?";
+    const firstMessage = request.query.firstMessage || "Olá, tudo bem?";
     const number = request.query.number || "Unknown";
     console.log(`First Message: ${firstMessage}`);
 
@@ -171,7 +171,7 @@ fastify.register(async (fastify) => {
                                     message: {
                                         type: "string",
                                         default:
-                                            "Goodbye! Ending the call now.",
+                                            "Até mais! Encerrando a ligação agora.",
                                     },
                                 },
                                 required: ["message"],
@@ -241,7 +241,7 @@ fastify.register(async (fastify) => {
                     session.callerNumber = callerNumber;
                     firstMessage =
                         customParameters?.firstMessage ||
-                        "Hello, how can I assist you?";
+                        "Olá, como posso ajudar-lo?";
                     console.log("First Message:", firstMessage);
                     console.log("Caller Number:", callerNumber);
 
@@ -324,7 +324,7 @@ fastify.register(async (fastify) => {
                     const args = JSON.parse(response.arguments);
 
                     if (functionName === "end_call") {
-                        const goodbyeMessage = args.message || "Goodbye!";
+                        const goodbyeMessage = args.message || "Até logo!";
                         console.log(
                             "Received end_call function. Goodbye message:",
                             goodbyeMessage,
@@ -366,7 +366,7 @@ fastify.register(async (fastify) => {
                                         content: [
                                             {
                                                 type: "input_text",
-                                                text: "Thank you, goodbye!",
+                                                text: "Obrigado, até mais!",
                                             },
                                         ],
                                     },
@@ -408,13 +408,13 @@ fastify.register(async (fastify) => {
                             const status = parsedResponse.Status || "unknown";
                             const bookingMessage =
                                 parsedResponse.Booking ||
-                                "I'm sorry, I couldn't book the service at that time. Do you have an alternative time?";
+                                "Desculpe, não consegui agendar o serviço neste momento. Você teria outra opção de horário?";
 
                             // Handle the response based on status
                             const responseMessage =
                                 status === "Successful"
-                                    ? `The booking was successful: ${bookingMessage}`
-                                    : `Unfortunately, the booking was unsuccessful. Here's the update: ${bookingMessage}`;
+                                    ? `A reserva foi realizada com sucesso: ${bookingMessage}`
+                                    : `Infelizmente não foi possível realizar o seu agendamento. ${bookingMessage}`;
 
                             // Send the booking status back to OpenAI
                             const functionOutputEvent = {
@@ -433,7 +433,7 @@ fastify.register(async (fastify) => {
                                     type: "response.create",
                                     response: {
                                         modalities: ["text", "audio"],
-                                        instructions: `Inform the user: ${responseMessage}. Be concise and friendly.`,
+                                        instructions: `Informe o usuário: ${responseMessage}. Seja simpático e vá direto ao ponto.`,
                                     },
                                 }),
                             );
@@ -494,8 +494,9 @@ fastify.register(async (fastify) => {
 
             await sendToWebhook(
                 {
+                    route: "2", // Route 2 for sending the transcript
                     data1: session.callerNumber,
-                    data2: session.transcript,
+                    data2: session.transcript, // Send the transcript to the webhook
                 },
                 TRANSCRIPT_WEBHOOK_URL,
             );
@@ -516,7 +517,7 @@ fastify.register(async (fastify) => {
                     response: {
                         modalities: ["text", "audio"],
                         instructions:
-                            "I apologize, but I'm having trouble processing your request right now. Is there anything else I can help you with?",
+                            "Peço desculpas, mas estou tendo problemas para processar sua solicitação no momento. Há algo mais que eu possa fazer por você?",
                     },
                 }),
             );
